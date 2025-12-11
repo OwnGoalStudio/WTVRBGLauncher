@@ -58,6 +58,7 @@ static BOOL gIsWeTypeEnabled = NO;
 static BOOL gIsBaiduEnabled = NO;
 static BOOL gIsSogouEnabled = NO;
 static BOOL gIsXunFeiEnabled = NO;
+static BOOL gIsDoubaoEnabled = NO;
 
 static NSTimeInterval gAnimationInterval = 0.3;
 static NSTimeInterval gAnimationDelay = 0.3;
@@ -75,6 +76,7 @@ static void ReloadPrefs() {
     gIsBaiduEnabled = settings[@"IsBaiduEnabled"] ? [settings[@"IsBaiduEnabled"] boolValue] : YES;
     gIsSogouEnabled = settings[@"IsSogouEnabled"] ? [settings[@"IsSogouEnabled"] boolValue] : YES;
     gIsXunFeiEnabled = settings[@"IsXunFeiEnabled"] ? [settings[@"IsXunFeiEnabled"] boolValue] : YES;
+    gIsDoubaoEnabled = settings[@"IsDoubaoEnabled"] ? [settings[@"IsDoubaoEnabled"] boolValue] : YES;
     gAnimationInterval = settings[@"AnimationInterval"] ? [settings[@"AnimationInterval"] doubleValue] / 1000.0 : 0.3;
     gAnimationDelay = settings[@"AnimationDelay"] ? [settings[@"AnimationDelay"] doubleValue] / 1000.0 : 0.3;
 
@@ -131,12 +133,22 @@ static void ReloadPrefs() {
             gFrozenAppSceneIdentifier = prevBundleIdentifier;
             return YES;
         }
+        if (gIsDoubaoEnabled &&
+            [nextBundleIdentifier isEqualToString:@"com.bytedance.ios.doubaoime"] &&
+            [nextURL isKindOfClass:[NSURL class]] &&
+            [nextURL.scheme isEqualToString:@"oime"] &&
+            [nextURL.host isEqualToString:@"start_asr_from_keyboard"]
+        ) {
+            gFrozenAppSceneIdentifier = prevBundleIdentifier;
+            return YES;
+        }
         BOOL isFromBreadcrumb = [nextEntity.activationSettings flagForActivationSetting:SBActivationSettingFromBreadcrumb];
         if (isFromBreadcrumb && (
             (gIsWeTypeEnabled && [prevBundleIdentifier isEqualToString:@"com.tencent.wetype"]) || 
             (gIsBaiduEnabled && [prevBundleIdentifier isEqualToString:@"com.baidu.inputMethod"]) || 
             (gIsSogouEnabled && [prevBundleIdentifier isEqualToString:@"com.sogou.sogouinput"]) || 
-            (gIsXunFeiEnabled && [prevBundleIdentifier isEqualToString:@"com.iflytek.inputime"])
+            (gIsXunFeiEnabled && [prevBundleIdentifier isEqualToString:@"com.iflytek.inputime"]) ||
+            (gIsDoubaoEnabled && [prevBundleIdentifier isEqualToString:@"com.bytedance.ios.doubaoime"])
         )) {
             return YES;
         }

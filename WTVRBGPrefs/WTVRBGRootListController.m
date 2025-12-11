@@ -49,6 +49,12 @@ static void RemoveSpecifiersWithKey(NSString *key, NSMutableArray *specifiers) {
 		} else {
 			installedCount++;
 		}
+		BOOL isDoubaoInstalled = [[LSApplicationProxy applicationProxyForIdentifier:@"com.bytedance.ios.doubaoime"] isInstalled];
+		if (!isDoubaoInstalled) {
+			RemoveSpecifiersWithKey(@"IsDoubaoEnabled", specifiers);
+		} else {
+			installedCount++;
+		}
 		if (installedCount > 0) {
 			_specifiers = specifiers;
 		} else {
